@@ -28,7 +28,7 @@
 \topmargin=0pt
 \begin{document}
 
-\SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 \title{An introduction to rSFFreader}
 
 \maketitle
