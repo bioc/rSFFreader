@@ -19,6 +19,7 @@ extern "C" {
 
 //#include "encode.h"
 #include "IRanges_interface.h"
+#include "XVector_interface.h"
 #include "Biostrings_interface.h"
 
 

@@ -18,7 +18,7 @@
 \alias{writePhredQual,FastqQuality-method}
 \alias{writeFastq,SffReadsQ,ANY-method}
 \alias{quality,ANY-method}
-\alias{append,SffReadsQ,SffReadsQ,missing-method}
+\alias{append,SffReadsQ,SffReadsQ-method}
 \alias{quality}
 \alias{writeFastaQual}
 \alias{writePhredQual}
@@ -110,7 +110,7 @@ SffReadsQ(sread, quality, qualityIR, adapterIR, customIR, clipMode="raw", header
       \code{basefilename} already exists. Use \code{append=TRUE} to append to an
       existing file. \code{basefilename} is expanded using \code{path.expand} and 
       the suffixes [basefilename].fasta (sequence) and [basefilename].fasta.qual (qualities) are added.}
-    \item{append}{\code{signature(x = "SffReadsQ", values = "SffReads", length = "missing")}:
+    \item{append}{\code{signature(x = "SffReadsQ", values = "SffReads")}:
       append the \code{sread}, \code{quality} and \code{id} slots of
       \code{values} after the corresponding fields of \code{x}.}
    }

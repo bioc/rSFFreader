@@ -111,7 +111,7 @@ setMethod("[", c("SffReadsQ", "ANY", "ANY"),
 
 setMethod("[", c("SffReadsQ", "ANY", "missing"), .SffReadsQ_subset)
 
-setMethod(append, c("SffReadsQ", "SffReadsQ", "missing"),
+setMethod(append, c("SffReadsQ", "SffReadsQ"),
     function(x, values, after=length(x))
 {
     appendCustom <- function(IR1,IR2,width1,width2){

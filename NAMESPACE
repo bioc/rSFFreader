@@ -1,8 +1,10 @@
 useDynLib(rSFFreader)
 
 import(methods)
-import(Biostrings)
+import(BiocGenerics)
 import(IRanges)
+import(XVector)
+import(Biostrings)
 
 
 exportClasses(

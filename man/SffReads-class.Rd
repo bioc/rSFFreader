@@ -30,7 +30,7 @@
 \alias{sread}
 \alias{id,SffReads-method}
 \alias{name,SffReads-method}
-\alias{append,SffReads,SffReads,missing-method}
+\alias{append,SffReads,SffReads-method}
 \alias{width,SffReads-method}
 \alias{writeFasta,SffReads-method}
 \alias{solveSffSEW}
@@ -147,7 +147,7 @@ Class \code{"\linkS4class{SffHeader}"}, directly.
       sread slot of \code{object}, returning a DNAStringSet object of reads.}
     \item{id}{\code{signature(object = "SffReads")}: this function is included to maintain compatibilty with 
       the \code{\linkS4class{ShortRead}} class, returning a BStringSet object of read names for the \code{object}.}
-    \item{append}{\code{signature(x = "SffReads", values = "SffReads", length = "missing")}:
+    \item{append}{\code{signature(x = "SffReads", values = "SffReads")}:
       append the \code{sread} and \code{id} slots of \code{values} after
       the corresponding fields of \code{x}.}
     \item{writeFasta}{\code{signature(object="SffReads", file, ...)}: write
