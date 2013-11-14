@@ -424,11 +424,11 @@ typedef struct irange_values{
 
 typedef struct sff_loader {
     void (*load_seqid)(struct sff_loader *loader,
-        const cachedCharSeq *dataline);
+        const Chars_holder *dataline);
     void (*load_seq)(struct sff_loader *loader,
-        const cachedCharSeq *dataline);
+        const Chars_holder *dataline);
     void (*load_qual)(struct sff_loader *loader,
-        const cachedCharSeq *dataline);
+        const Chars_holder *dataline);
     void (*load_qclip)(struct sff_loader *loader,
         int start, int width);
     void (*load_aclip)(struct sff_loader *loader,
@@ -440,10 +440,10 @@ typedef struct sff_loader {
 
 typedef struct sff_loader_ext {
     CharAEAE ans_names_buf;
-    cachedXVectorList cached_seq;
-    cachedXVectorList cached_qual;
-    IRANGE_VALUES cached_qual_clip;
-    IRANGE_VALUES cached_adapt_clip;
+    XVectorList_holder seq_holder;
+    XVectorList_holder qual_holder;
+    IRANGE_VALUES qual_clip_buf;
+    IRANGE_VALUES adapt_clip_buf;
     const int *lkup_seq;
     int lkup_length_seq;
     const int *lkup_qual;
@@ -451,7 +451,7 @@ typedef struct sff_loader_ext {
 } SFF_loaderExt;
 
 static void SFF_load_seqid(SFFloader *loader,
-        const cachedCharSeq *dataline)
+        const Chars_holder *dataline)
 {
     SFF_loaderExt *loader_ext;
     CharAEAE *ans_names_buf;
@@ -463,36 +463,36 @@ static void SFF_load_seqid(SFFloader *loader,
     return;
 }
 
-static void SFF_load_seq(SFFloader *loader, const cachedCharSeq *dataline)
+static void SFF_load_seq(SFFloader *loader, const Chars_holder *dataline)
 {
     SFF_loaderExt *loader_ext;
-    cachedCharSeq cached_ans_elt;
+    Chars_holder ans_elt_holder;
 
     loader_ext = loader->ext;
-    cached_ans_elt = get_cachedXRawList_elt(&(loader_ext->cached_seq),
+    ans_elt_holder = get_elt_from_XRawList_holder(&(loader_ext->seq_holder),
                         loader->nrec);
 
-    /* cached_ans_elt.seq is a const char * so we need to cast it to
+    /* ans_elt_holder.seq is a const char * so we need to cast it to
        char * before we can write to it */
-    Ocopy_bytes_to_i1i2_with_lkup(0, cached_ans_elt.length - 1,
-        (char *) cached_ans_elt.seq, cached_ans_elt.length,
+    Ocopy_bytes_to_i1i2_with_lkup(0, ans_elt_holder.length - 1,
+        (char *) ans_elt_holder.seq, ans_elt_holder.length,
         dataline->seq, dataline->length,
         loader_ext->lkup_seq, loader_ext->lkup_length_seq);
     return;
 }
 
-static void SFF_load_qual(SFFloader *loader, const cachedCharSeq *dataline)
+static void SFF_load_qual(SFFloader *loader, const Chars_holder *dataline)
 {
     SFF_loaderExt *loader_ext;
-    cachedCharSeq cached_ans_elt;
+    Chars_holder ans_elt_holder;
 
     loader_ext = loader->ext;
-    cached_ans_elt = get_cachedXRawList_elt(&(loader_ext->cached_qual),
+    ans_elt_holder = get_elt_from_XRawList_holder(&(loader_ext->qual_holder),
                         loader->nrec);
-    /* cached_ans_elt.seq is a const char * so we need to cast it to
+    /* ans_elt_holder.seq is a const char * so we need to cast it to
        char * before we can write to it */
-    Ocopy_bytes_to_i1i2_with_lkup(0, cached_ans_elt.length - 1,
-        (char *) cached_ans_elt.seq, cached_ans_elt.length,
+    Ocopy_bytes_to_i1i2_with_lkup(0, ans_elt_holder.length - 1,
+        (char *) ans_elt_holder.seq, ans_elt_holder.length,
         dataline->seq, dataline->length,
         loader_ext->lkup_qual, loader_ext->lkup_length_qual);
     return;
@@ -504,7 +504,7 @@ static void SFF_load_qclip(SFFloader *loader, int start, int width)
     loader_ext = loader->ext;
     
 	IRANGE_VALUES clip_result;
-	clip_result = loader_ext->cached_qual_clip;
+	clip_result = loader_ext->qual_clip_buf;
 
 	clip_result.start[(int)loader->nrec] = start;
 	clip_result.width[(int)loader->nrec] = width;
@@ -521,7 +521,7 @@ static void SFF_load_aclip(SFFloader *loader, int start, int width)
     loader_ext = loader->ext;
 
 	IRANGE_VALUES clip_result;
-	clip_result = loader_ext->cached_adapt_clip;
+	clip_result = loader_ext->adapt_clip_buf;
 
 	clip_result.start[loader->nrec] = start;
 	clip_result.width[loader->nrec] = width;
@@ -532,10 +532,10 @@ static void SFF_load_aclip(SFFloader *loader, int start, int width)
 }
 
 void freeLoader(SFF_loaderExt loader) {
-    free(loader.cached_qual_clip.width);
-    free(loader.cached_qual_clip.start);
-    free(loader.cached_adapt_clip.width);
-    free(loader.cached_adapt_clip.start);
+    free(loader.qual_clip_buf.width);
+    free(loader.qual_clip_buf.start);
+    free(loader.adapt_clip_buf.width);
+    free(loader.adapt_clip_buf.start);
 }
 
 static SFF_loaderExt new_SFF_loaderExt(SEXP seq, SEXP qual, SEXP lkup_seq, SEXP lkup_qual)
@@ -544,14 +544,14 @@ static SFF_loaderExt new_SFF_loaderExt(SEXP seq, SEXP qual, SEXP lkup_seq, SEXP 
 
     loader_ext.ans_names_buf =
         new_CharAEAE(get_XVectorList_length(seq), 0);
-    loader_ext.cached_seq = cache_XVectorList(seq);
-    loader_ext.cached_qual = cache_XVectorList(qual);
+    loader_ext.seq_holder = hold_XVectorList(seq);
+    loader_ext.qual_holder = hold_XVectorList(qual);
 
-    loader_ext.cached_qual_clip.width = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
-    loader_ext.cached_qual_clip.start = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
+    loader_ext.qual_clip_buf.width = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
+    loader_ext.qual_clip_buf.start = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
 
-    loader_ext.cached_adapt_clip.width = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
-    loader_ext.cached_adapt_clip.start = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
+    loader_ext.adapt_clip_buf.width = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
+    loader_ext.adapt_clip_buf.start = (int *) R_alloc((long) get_XVectorList_length(seq), sizeof(int));
 
     if (lkup_seq == R_NilValue) {
         loader_ext.lkup_seq = NULL;
@@ -596,7 +596,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
     COMMONheader commonHeader;
     READheader header;
 
-    cachedCharSeq dataline;
+    Chars_holder dataline;
 
     // C declarations
     int i, padding_size, fres, load_record;
@@ -864,14 +864,14 @@ read_sff(SEXP files, SEXP use_names, SEXP lkup_seq, SEXP lkup_qual, SEXP verbose
 
 	PROTECT(qclip_start = NEW_INTEGER(ans_length));
 	PROTECT(qclip_width = NEW_INTEGER(ans_length));
-	memcpy(INTEGER(qclip_start), loader_ext.cached_qual_clip.start, sizeof(int) * ans_length);
-	memcpy(INTEGER(qclip_width), loader_ext.cached_qual_clip.width, sizeof(int) * ans_length);
+	memcpy(INTEGER(qclip_start), loader_ext.qual_clip_buf.start, sizeof(int) * ans_length);
+	memcpy(INTEGER(qclip_width), loader_ext.qual_clip_buf.width, sizeof(int) * ans_length);
 	PROTECT(qual_clip = new_IRanges("IRanges", qclip_start, qclip_width, R_NilValue));
 
 	PROTECT(aclip_start = NEW_INTEGER(ans_length));
 	PROTECT(aclip_width = NEW_INTEGER(ans_length));
-	memcpy(INTEGER(aclip_start), loader_ext.cached_adapt_clip.start, sizeof(int) * ans_length);
-	memcpy(INTEGER(aclip_width), loader_ext.cached_adapt_clip.width, sizeof(int) * ans_length);
+	memcpy(INTEGER(aclip_start), loader_ext.adapt_clip_buf.start, sizeof(int) * ans_length);
+	memcpy(INTEGER(aclip_width), loader_ext.adapt_clip_buf.width, sizeof(int) * ans_length);
 	PROTECT(adapt_clip = new_IRanges("IRanges", aclip_start, aclip_width, R_NilValue));
 
     PROTECT(ans = NEW_LIST(5));
@@ -901,14 +901,14 @@ read_sff(SEXP files, SEXP use_names, SEXP lkup_seq, SEXP lkup_qual, SEXP verbose
 /******************************* Write out phred qualities *************************/
 
 char *
-_cache_to_char(cachedXStringSet *cache, const int i,
+_holder_to_char(XStringSet_holder *holder, const int i,
                char *buf, const int width)
 {
-    cachedCharSeq roSeq = get_cachedXStringSet_elt(cache, i);
-    if (roSeq.length > width)
+    Chars_holder chars_holder = get_elt_from_XStringSet_holder(holder, i);
+    if (chars_holder.length > width)
         return NULL;
-    strncpy(buf, roSeq.seq, roSeq.length);
-    buf[roSeq.length] = '\0';
+    strncpy(buf, chars_holder.seq, chars_holder.length);
+    buf[chars_holder.length] = '\0';
     return buf;
 }
 
@@ -935,8 +935,8 @@ write_phred_quality(SEXP id, SEXP quality,
         Rf_error("'%s' must be %s", "max_width", "'integer(1)', >=0");
     const int width = INTEGER(max_width)[0];
 
-    cachedXStringSet xid = cache_XStringSet(id),
-                     xquality = cache_XStringSet(quality);
+    XStringSet_holder xid = hold_XStringSet(id),
+                      xquality = hold_XStringSet(quality);
 
     FILE *fout = fopen(CHAR(STRING_ELT(fname, 0)), 
                        CHAR(STRING_ELT(fmode, 0)));
@@ -948,14 +948,14 @@ write_phred_quality(SEXP id, SEXP quality,
         *qualbuf = (char *) R_alloc(sizeof(char), width + 1);
     int i, j, phredval;
     for (i = 0; i < len; ++i) {
-        idbuf = _cache_to_char(&xid, i, idbuf, width);
+        idbuf = _holder_to_char(&xid, i, idbuf, width);
         if (idbuf == NULL){
 			fclose(fout);
 			Rf_error("failed to write record %d", i + 1);
 		}
 		fprintf(fout, ">%s\n",idbuf);
         
-        qualbuf = _cache_to_char(&xquality, i, qualbuf, width);
+        qualbuf = _holder_to_char(&xquality, i, qualbuf, width);
         if (qualbuf == NULL){
 			fclose(fout);
 			Rf_error("failed to write record %d", i + 1);
