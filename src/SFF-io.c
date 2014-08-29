@@ -15,7 +15,11 @@ extern "C" {
 #include <string.h>
 #include <stdint.h>        // uint64_t, uint32_t, uint16_t
 #include <stdlib.h>        // malloc(), free()
+#ifdef _WIN32
+#include <winsock2.h> //htons(), htonl()
+#else
 #include <arpa/inet.h>  // htons(), htonl()
+#endif
 
 //#include "encode.h"
 #include "Biostrings_interface.h"
