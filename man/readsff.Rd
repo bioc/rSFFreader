@@ -10,7 +10,8 @@
 }
 
 \usage{
-readSff(filenames, use.qualities=TRUE, use.names=TRUE, clipMode = c("full", "adapter", "quality", "raw"), verbose=TRUE)
+readSff(filenames, use.qualities=TRUE, use.names=TRUE,
+    clipMode = c("full", "adapter", "quality", "raw"), verbose=TRUE)
 }
 
 

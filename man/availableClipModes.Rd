@@ -65,7 +65,8 @@ alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)), alphabet=c("A","C","T","
 
 cols <- c("green","blue","black","red","darkgrey")
 leg <-  c("A","C","T","G","N")
-matplot(t(alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)), alphabet=c("A","C","T","G"))), type="l", lty=1, col=cols)
+matplot(t(alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)),
+    alphabet=c("A","C","T","G"))), type="l", lty=1, col=cols)
 legend("topright", col=cols, legend=leg, pch=18, cex=.8)
 
 ## Compare this to unclipped reads using "raw" mode:
@@ -76,7 +77,8 @@ alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)), alphabet=c("A","C","T","
 
 cols <- c("green","blue","black","red","darkgrey")
 leg <-  c("A","C","T","G","N")
-matplot(t(alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)), alphabet=c("A","C","T","G"))), type="l", lty=1, col=cols)
+matplot(t(alphabetByCycle(DNAStringSet(substr(sread(sff), 1,15)),
+    alphabet=c("A","C","T","G"))), type="l", lty=1, col=cols)
 legend("topright", col=cols, legend=leg, pch=18, cex=.8)
 
 ## Extract clip points for further analysis:

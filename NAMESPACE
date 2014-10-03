@@ -1,11 +1,9 @@
 useDynLib(rSFFreader)
 
+import(ShortRead)
 import(methods)
-import(BiocGenerics)
 import(IRanges)
-import(XVector)
 import(Biostrings)
-
 
 exportClasses(
   SffHeader, SffReads, SffReadsQ
