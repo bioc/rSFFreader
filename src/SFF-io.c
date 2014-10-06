@@ -250,10 +250,8 @@ CharToPhred(char score)
  */
 COMMONheader
 readCommonHeader(const char *fname){
-      int i, padding_size, fres;
+    int i, fres;
     char ch;
-    uint16_t uint16;
-    uint8_t uint8;
     COMMONheader commonHeader;
 
     FILE* file = fopen (fname, "r");
@@ -261,8 +259,9 @@ readCommonHeader(const char *fname){
         Rf_error("cannot open specified file: '%s'", fname);
 
     /** Read Common Header Section **/
-    int size = fread( &commonHeader.magic_number, sizeof(uint32_t), 1, file);
+    fres = fread( &commonHeader.magic_number, sizeof(uint32_t), 1, file);
     commonHeader.magic_number = htonl(commonHeader.magic_number);
+
     fres = fread( commonHeader.version, sizeof(char), 4, file);
 
     fres = fread( &commonHeader.index_offset, sizeof(uint64_t), 1, file);
@@ -283,7 +282,8 @@ readCommonHeader(const char *fname){
     fres = fread( &commonHeader.number_of_flows_per_read, sizeof(uint16_t), 1, file);
     commonHeader.number_of_flows_per_read = htons(commonHeader.number_of_flows_per_read);
 
-    fres - fread( &commonHeader.flowgram_format_code, sizeof(uint8_t),1, file);
+    fres = fread( &commonHeader.flowgram_format_code, sizeof(uint8_t),1, file);
+    
     // check flowgram_format_code
     if (commonHeader.flowgram_format_code != 1)
         Rf_error("Unknown flowgram format code value:%u",commonHeader.flowgram_format_code);
@@ -680,6 +680,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         int cindex = 0;
         for(i=0; i<header.number_of_bases; i++) {
             fres = fread( &uint8, sizeof(uint8_t), 1, file);
+            uint8 = htons(uint8);
             data.index[i] = (int)uint8 + cindex;
             cindex = data.index[i];
         }
@@ -705,6 +706,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         if (data.quality==NULL) Rf_error("cannot allocate memory");
         for(i=0; i<header.number_of_bases; i++) {
             fres = fread( &uint8, sizeof(uint8_t), 1, file);
+            uint8 = htons(uint8);
             data.quality[i] = phredToChar(uint8);
         }
         data.quality[header.number_of_bases] = '\0';
