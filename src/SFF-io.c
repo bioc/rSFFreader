@@ -920,8 +920,7 @@ _holder_to_char(XStringSet_holder *holder, const int i,
 }
 
 SEXP
-write_phred_quality(SEXP id, SEXP quality, 
-            SEXP fname, SEXP fmode, SEXP max_width)
+write_phred_quality(SEXP id, SEXP quality, SEXP fname, SEXP fmode, SEXP max_width)
 {
     if (!(IS_S4_OBJECT(id) && 
           strcmp(get_classname(id), "BStringSet") == 0))

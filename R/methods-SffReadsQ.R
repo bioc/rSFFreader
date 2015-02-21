@@ -207,8 +207,7 @@ setMethod(writePhredQual, "SffReadsQ", function(object, filepath, mode="w", ...)
     ## FIXME: different quality types
     max_width <- max( unique(width(quality(object))))
     
-    .Call("write_phred_quality", id(object), 
-          quality(quality(object)), file, mode, max_width)
+    .Call("write_phred_quality", id(object), quality(quality(object)), file, mode, max_width)
     invisible(length(object))
 })
 
