@@ -250,7 +250,7 @@ CharToPhred(char score)
  */
 COMMONheader
 readCommonHeader(const char *fname){
-    int i, fres;
+    int i;
     char ch;
     COMMONheader commonHeader;
 
@@ -259,30 +259,30 @@ readCommonHeader(const char *fname){
         Rf_error("cannot open specified file: '%s'", fname);
 
     /** Read Common Header Section **/
-    fres = fread( &commonHeader.magic_number, sizeof(uint32_t), 1, file);
+    fread( &commonHeader.magic_number, sizeof(uint32_t), 1, file);
     commonHeader.magic_number = htonl(commonHeader.magic_number);
 
-    fres = fread( commonHeader.version, sizeof(char), 4, file);
+    fread( commonHeader.version, sizeof(char), 4, file);
 
-    fres = fread( &commonHeader.index_offset, sizeof(uint64_t), 1, file);
+    fread( &commonHeader.index_offset, sizeof(uint64_t), 1, file);
     commonHeader.index_offset = BE64toNA(commonHeader.index_offset);
 
-    fres = fread( &commonHeader.index_length, sizeof(uint32_t), 1, file);
+    fread( &commonHeader.index_length, sizeof(uint32_t), 1, file);
     commonHeader.index_length = htonl(commonHeader.index_length);
 
-    fres = fread( &commonHeader.number_of_reads, sizeof(uint32_t), 1, file);
+    fread( &commonHeader.number_of_reads, sizeof(uint32_t), 1, file);
     commonHeader.number_of_reads = htonl(commonHeader.number_of_reads);
 
-    fres = fread( &commonHeader.commonHeader_length, sizeof(uint16_t), 1, file);
+    fread( &commonHeader.commonHeader_length, sizeof(uint16_t), 1, file);
     commonHeader.commonHeader_length = htons(commonHeader.commonHeader_length);
 
-    fres = fread( &commonHeader.key_length, sizeof(uint16_t), 1, file);
+    fread( &commonHeader.key_length, sizeof(uint16_t), 1, file);
     commonHeader.key_length = htons(commonHeader.key_length);
 
-    fres = fread( &commonHeader.number_of_flows_per_read, sizeof(uint16_t), 1, file);
+    fread( &commonHeader.number_of_flows_per_read, sizeof(uint16_t), 1, file);
     commonHeader.number_of_flows_per_read = htons(commonHeader.number_of_flows_per_read);
 
-    fres = fread( &commonHeader.flowgram_format_code, sizeof(uint8_t),1, file);
+    fread( &commonHeader.flowgram_format_code, sizeof(uint8_t),1, file);
     
     // check flowgram_format_code
     if (commonHeader.flowgram_format_code != 1)
@@ -294,7 +294,7 @@ readCommonHeader(const char *fname){
     if (commonHeader.flow_chars==NULL) Rf_error("cannot allocate memory");
 
     for(i=0; i<commonHeader.number_of_flows_per_read; i++) {
-        fres = fread(&ch, sizeof(char), 1, file);
+        fread(&ch, sizeof(char), 1, file);
         commonHeader.flow_chars[i] = ch;
     }
     commonHeader.flow_chars[i] = '\0';
@@ -306,7 +306,7 @@ readCommonHeader(const char *fname){
     if (commonHeader.key_sequence==NULL) Rf_error("cannot allocate memory");
 
     for(i=0; i<commonHeader.key_length; i++) {
-        fres = fread(&ch, sizeof(char), 1, file);
+        fread(&ch, sizeof(char), 1, file);
         commonHeader.key_sequence[i] = ch;
     }
     commonHeader.key_sequence[i] = '\0';
@@ -604,7 +604,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
     Chars_holder dataline;
 
     // C declarations
-    int i, padding_size, fres, load_record;
+    int i, padding_size, load_record;
     char ch;
     uint16_t uint16;
     uint8_t uint8;
@@ -625,19 +625,19 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
     // for every read,
     for(int read=0; read<commonHeader.number_of_reads; read++) {
         // Read Header Section
-        fres = fread( &header.read_header_length, sizeof(uint16_t), 1, file);
+        fread( &header.read_header_length, sizeof(uint16_t), 1, file);
         header.read_header_length = htons(header.read_header_length);
-        fres = fread( &header.name_length, sizeof(uint16_t), 1, file);
+        fread( &header.name_length, sizeof(uint16_t), 1, file);
         header.name_length = htons(header.name_length);
-        fres = fread( &header.number_of_bases, sizeof(uint32_t), 1, file);
+        fread( &header.number_of_bases, sizeof(uint32_t), 1, file);
         header.number_of_bases = htonl(header.number_of_bases);
-        fres = fread( &header.clip_qual_left, sizeof(uint16_t), 1, file);
+        fread( &header.clip_qual_left, sizeof(uint16_t), 1, file);
         header.clip_qual_left = htons(header.clip_qual_left);
-        fres = fread( &header.clip_qual_right, sizeof(uint16_t), 1, file);
+        fread( &header.clip_qual_right, sizeof(uint16_t), 1, file);
         header.clip_qual_right = htons(header.clip_qual_right);
-        fres = fread( &header.clip_adapter_left, sizeof(uint16_t), 1, file);
+        fread( &header.clip_adapter_left, sizeof(uint16_t), 1, file);
         header.clip_adapter_left = htons(header.clip_adapter_left);
-        fres = fread( &header.clip_adapter_right, sizeof(uint16_t), 1, file);
+        fread( &header.clip_adapter_right, sizeof(uint16_t), 1, file);
         header.clip_adapter_right = htons(header.clip_adapter_right);
 
         // Determine whether or not to load the record
@@ -653,7 +653,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         data.name = malloc(sizeof(char)*(header.name_length+1));
         if(data.name==NULL) Rf_error("id: cannot allocate memory");
 
-        fres = fread( data.name, sizeof(char),header.name_length, file);
+        fread( data.name, sizeof(char),header.name_length, file);
         data.name[header.name_length] = '\0';
 
 
@@ -671,7 +671,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         // Flows
         data.flows = (float*) malloc(sizeof(float)*(commonHeader.number_of_flows_per_read));
         for(i=0; i<commonHeader.number_of_flows_per_read; i++) {
-            fres = fread( &uint16, sizeof(uint16_t), 1, file);
+            fread( &uint16, sizeof(uint16_t), 1, file);
             uint16 = htons(uint16);
             data.flows[i] = uint16/100.0;
         }
@@ -679,7 +679,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         data.index = (int*) malloc(sizeof(int)*(header.number_of_bases));
         int cindex = 0;
         for(i=0; i<header.number_of_bases; i++) {
-            fres = fread( &uint8, sizeof(uint8_t), 1, file);
+            fread( &uint8, sizeof(uint8_t), 1, file);
             uint8 = htons(uint8);
             data.index[i] = (int)uint8 + cindex;
             cindex = data.index[i];
@@ -688,7 +688,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         data.bases = (char*) malloc(sizeof(char)*(header.number_of_bases+1));
         if (data.bases==NULL) Rf_error("cannot allocate memory");
         for(i=0; i<header.number_of_bases; i++) {
-            fres = fread( &ch, sizeof(char), 1, file);
+            fread( &ch, sizeof(char), 1, file);
             data.bases[i] = ch;
             if(ch!='A' && ch!='T' && ch!='G' && ch!='C' && ch!='N') Rf_error("base error at %i:%c ",i, ch);
         }
@@ -705,7 +705,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         data.quality = (char*) malloc(sizeof(char)*(header.number_of_bases+1));
         if (data.quality==NULL) Rf_error("cannot allocate memory");
         for(i=0; i<header.number_of_bases; i++) {
-            fres = fread( &uint8, sizeof(uint8_t), 1, file);
+            fread( &uint8, sizeof(uint8_t), 1, file);
             //uint8 = htons(uint8);
             data.quality[i] = phredToChar(uint8);
         }
@@ -743,7 +743,7 @@ sff_geometry(SEXP files)
     READheader header;
 
     // C declarations
-    int nrec, nfiles, i, recno, skip, padding_size, fres;
+    int nrec, nfiles, i, recno, skip, padding_size;
     const char *fname;
     nrec = recno = 0;
     static const char *names[] = {"number_of_reads","read_lengths"};
@@ -775,19 +775,19 @@ sff_geometry(SEXP files)
         // for every read,
         for(int read=0; read<commonHeader.number_of_reads; read++) {
             // Read Header Section
-            fres = fread( &header.read_header_length, sizeof(uint16_t), 1, file);
+            fread( &header.read_header_length, sizeof(uint16_t), 1, file);
             header.read_header_length = htons(header.read_header_length);
-            fres = fread( &header.name_length, sizeof(uint16_t), 1, file);
+            fread( &header.name_length, sizeof(uint16_t), 1, file);
             header.name_length = htons(header.name_length);
-            fres = fread( &header.number_of_bases, sizeof(uint32_t), 1, file);
+            fread( &header.number_of_bases, sizeof(uint32_t), 1, file);
             header.number_of_bases = htonl(header.number_of_bases);
-            fres = fread( &header.clip_qual_left, sizeof(uint16_t), 1, file);
+            fread( &header.clip_qual_left, sizeof(uint16_t), 1, file);
             header.clip_qual_left = htons(header.clip_qual_left);
-            fres = fread( &header.clip_qual_right, sizeof(uint16_t), 1, file);
+            fread( &header.clip_qual_right, sizeof(uint16_t), 1, file);
             header.clip_qual_right = htons(header.clip_qual_right);
-            fres = fread( &header.clip_adapter_left, sizeof(uint16_t), 1, file);
+            fread( &header.clip_adapter_left, sizeof(uint16_t), 1, file);
             header.clip_adapter_left = htons(header.clip_adapter_left);
-            fres = fread( &header.clip_adapter_right, sizeof(uint16_t), 1, file);
+            fread( &header.clip_adapter_right, sizeof(uint16_t), 1, file);
             header.clip_adapter_right = htons(header.clip_adapter_right);
 
             skip = ((commonHeader.number_of_flows_per_read*flowgram_bytes_per_flow) +
