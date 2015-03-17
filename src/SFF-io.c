@@ -463,8 +463,8 @@ static void SFF_load_seqid(SFFloader *loader,
 
     loader_ext = loader->ext;
     ans_names_buf = &(loader_ext->ans_names_buf);
-    // This works only because dataline->seq is nul-terminated!
-    append_string_to_CharAEAE(ans_names_buf, dataline->seq);
+    // This works only because dataline->ptr is nul-terminated!
+    append_string_to_CharAEAE(ans_names_buf, dataline->ptr);
     return;
 }
 
@@ -480,8 +480,8 @@ static void SFF_load_seq(SFFloader *loader, const Chars_holder *dataline)
     /* ans_elt_holder.ptr is a const char * so we need to cast it to
        char * before we can write to it */
     Ocopy_bytes_to_i1i2_with_lkup(0, ans_elt_holder.length - 1,
-        (char *) ans_elt_holder.seq, ans_elt_holder.length,
-        dataline->seq, dataline->length,
+        (char *) ans_elt_holder.ptr, ans_elt_holder.length,
+        dataline->ptr, dataline->length,
         loader_ext->lkup_seq, loader_ext->lkup_length_seq);
     return;
 }
@@ -497,8 +497,8 @@ static void SFF_load_qual(SFFloader *loader, const Chars_holder *dataline)
     /* ans_elt_holder.ptr is a const char * so we need to cast it to
        char * before we can write to it */
     Ocopy_bytes_to_i1i2_with_lkup(0, ans_elt_holder.length - 1,
-        (char *) ans_elt_holder.seq, ans_elt_holder.length,
-        dataline->seq, dataline->length,
+        (char *) ans_elt_holder.ptr, ans_elt_holder.length,
+        dataline->ptr, dataline->length,
         loader_ext->lkup_qual, loader_ext->lkup_length_qual);
     return;
 }
@@ -658,7 +658,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
 
 
         dataline.length = strlen(data.name);
-        dataline.seq = data.name;
+        dataline.ptr = data.name;
         if (load_record && loader->load_seqid != NULL) {
             loader->load_seqid(loader, &dataline);
         }
@@ -697,7 +697,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
 //TODO: SAMS function to adapter find/clip and assign MID
 
         dataline.length = strlen(data.bases);
-        dataline.seq = data.bases;
+        dataline.ptr = data.bases;
         if (load_record && loader->load_seq != NULL)
             loader->load_seq(loader, &dataline);
 
@@ -712,7 +712,7 @@ readSFF(SEXP string, int *recno, SFFloader *loader)
         data.quality[header.number_of_bases] = '\0';
 
         dataline.length = strlen(data.quality);
-        dataline.seq = data.quality;
+        dataline.ptr = data.quality;
         if (load_record && loader->load_qual != NULL)
             loader->load_qual(loader, &dataline);
 
@@ -914,7 +914,7 @@ _holder_to_char(XStringSet_holder *holder, const int i,
     Chars_holder chars_holder = get_elt_from_XStringSet_holder(holder, i);
     if (chars_holder.length > width)
         return NULL;
-    strncpy(buf, chars_holder.seq, chars_holder.length);
+    strncpy(buf, chars_holder.ptr, chars_holder.length);
     buf[chars_holder.length] = '\0';
     return buf;
 }
