@@ -12,7 +12,7 @@ extern "C" {
 #include <R_ext/Rdynload.h>
 
 // System includes
-#include <zlib.h>
+//#include <zlib.h>
 #include <stdint.h>		// uint64_t, uint32_t, uint16_t
 
 
