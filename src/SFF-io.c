@@ -444,7 +444,7 @@ typedef struct sff_loader {
 
 
 typedef struct sff_loader_ext {
-    CharAEAE ans_names_buf;
+    CharAEAE *ans_names_buf;
     XVectorList_holder seq_holder;
     XVectorList_holder qual_holder;
     IRANGE_VALUES qual_clip_buf;
@@ -462,7 +462,7 @@ static void SFF_load_seqid(SFFloader *loader,
     CharAEAE *ans_names_buf;
 
     loader_ext = loader->ext;
-    ans_names_buf = &(loader_ext->ans_names_buf);
+    ans_names_buf = loader_ext->ans_names_buf;
     // This works only because dataline->ptr is nul-terminated!
     append_string_to_CharAEAE(ans_names_buf, dataline->ptr);
     return;
@@ -863,7 +863,7 @@ read_sff(SEXP files, SEXP use_names, SEXP lkup_seq, SEXP lkup_qual, SEXP verbose
     // load in the seq_ids
     if (load_seqids) {
         PROTECT(ans_names =
-            new_CHARACTER_from_CharAEAE(&(loader_ext.ans_names_buf))); //IRanges
+            new_CHARACTER_from_CharAEAE(loader_ext.ans_names_buf)); //IRanges
         set_XVectorList_names(reads, ans_names); //IRanges
 //        set_XVectorList_names(quals, ans_names); //IRanges
         UNPROTECT(1);
