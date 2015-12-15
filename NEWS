@@ -13,6 +13,7 @@ NEW FEATURES
     o All features are new
 
 BUG FIXES
+
 Comments by Herve, during the Bioconductor submission
 
 1. 'R CMD check' produces the following warning:
