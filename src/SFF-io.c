@@ -464,7 +464,7 @@ static void SFF_load_seqid(SFFloader *loader,
     loader_ext = loader->ext;
     ans_names_buf = loader_ext->ans_names_buf;
     // This works only because dataline->ptr is nul-terminated!
-    append_string_to_CharAEAE(ans_names_buf, dataline->ptr);
+    CharAEAE_append_string(ans_names_buf, dataline->ptr);
     return;
 }
 
